@@ -39,6 +39,8 @@ struct PLAYER
 HDC Tiles_DC = NULL;
 struct TILES
 {
+	HBITMAP h_img_background;
+	BITMAP img_background;
 	HBITMAP hApple;
 	BITMAP Apple;
 	HBITMAP hBanana;
@@ -89,6 +91,7 @@ bool CGraphics::Init(HWND hwnd)
 		return false;
 	}
 
+	//init_map(hwnd, "level1.txt");
 	// Setting bools for movement to false so there is no movement
 	up = false;
 	down = false;
@@ -119,6 +122,18 @@ bool CGraphics::Init(HWND hwnd)
 
 	//-------------------------------------------------------------------
 		// Ladddar in bmp bilder för alla objekt i spelet
+
+	// renaming apples to acorns instead, remove the image file for this later.
+	Tile.h_img_background = (HBITMAP)LoadImage(NULL, "background.bmp",
+                                    IMAGE_BITMAP, 0, 0,
+                                    LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	if( Tile.h_img_background == 0 )
+	{
+		MessageBox(hwnd,TEXT("Error, no background.bmp in directory\n"), TEXT("Error"),MB_ICONERROR | MB_OK);
+		return false;
+	}
+
+
 	Player.hIcon = (HBITMAP)LoadImage(NULL,"Squirrel.bmp",
 										IMAGE_BITMAP, 0, 0,
 										LR_CREATEDIBSECTION | LR_LOADFROMFILE);
@@ -128,7 +143,8 @@ bool CGraphics::Init(HWND hwnd)
 		return false;
 	}
 
-	Tile.hApple = (HBITMAP)LoadImage(NULL, "Apple.bmp",
+	// renaming apples to acorns instead, remove the image file for this later.
+	Tile.hApple = (HBITMAP)LoadImage(NULL, "acorns.bmp",
                                     IMAGE_BITMAP, 0, 0,
                                     LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 	if( Tile.hApple == 0 )
@@ -137,7 +153,8 @@ bool CGraphics::Init(HWND hwnd)
 		return false;
 	}
 
-	Tile.hBanana = (HBITMAP)LoadImage(NULL, "Banana.bmp",
+	// renaming bananas to acorns instead, remove the image file for this later.
+	Tile.hBanana = (HBITMAP)LoadImage(NULL, "acorns.bmp",
                                     IMAGE_BITMAP, 0, 0,
                                     LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 	if( Tile.hBanana == 0 )
@@ -156,6 +173,8 @@ bool CGraphics::Init(HWND hwnd)
 	}
 	
 	Tiles_DC = CreateCompatibleDC(NULL);
+
+	GetObject(Tile.h_img_background,sizeof(BITMAP), &Tile.img_background);
 
 	GetObject(Player.hIcon,sizeof(BITMAP), &Player.Icon);
 	GetObject(Tile.hWall, sizeof(BITMAP), &Tile.Wall);
@@ -182,7 +201,7 @@ void CGraphics::SplashScreen()
 	Tile.Intro.bmWidth, Tile.Intro.bmHeight, Tiles_DC, 0, 0, SRCCOPY);
 
 	BitBlt(gDC, 0, 0, GetSystemMetrics(SM_CXSCREEN), 
-		GetSystemMetrics(SM_CYSCREEN), BackBuffer, 0, 0, SRCCOPY);
+	GetSystemMetrics(SM_CYSCREEN), BackBuffer, 0, 0, SRCCOPY);
 
 	if(KEY_DOWN(VK_SPACE))
 		Splash = false;
@@ -219,6 +238,7 @@ void CGraphics::Menu()
 		if(KEY_DOWN(0x31))
 		{
 			LoadMap(main_window_handle,"level2.txt");
+			//init_map(main_window_handle, "level1.txt");
 		//	Init(main_window_handle);
 		}
 		if(KEY_DOWN(0x32))
@@ -270,85 +290,52 @@ bool CGraphics::Input()
 
 bool CGraphics::Paint()
 {
+    //    Initializing original object
+    HGDIOBJ original = NULL;
+	//    Saving the original object
+    original = SelectObject(Tiles_DC,GetStockObject(DC_PEN));
+
+	SelectObject(Tiles_DC,Tile.h_img_background);
+	BitBlt(BackBuffer, 0, 0, Tile.img_background.bmWidth, Tile.img_background.bmHeight, Tiles_DC, 0, 0, SRCCOPY);
+
+	BitBlt(gDC, 0, 0, GetSystemMetrics(SM_CXSCREEN), 
+	GetSystemMetrics(SM_CYSCREEN), BackBuffer, 0, 0, SRCCOPY);
+	//    Restoring the original object
+    SelectObject(Tiles_DC,original);
+
 	FPScounter.StartTimer();
 	//velocity test
 	x = Player.x;
 	y = Player.y;
-	Player.PrevX =Player.x;
+	Player.PrevX = Player.x;
 	Player.PrevY = Player.y;
 	Player.Velocity = velocity;
-	//Movement
-	if(left == true && Player.x > 0)
-	{
-		if(Player.x < col_size)
-		{
-			//Player.x = 300;
-		}
-		else
-		{
-			Player.x -= 32;//Player.Velocity;
-			Sleep(100);
-		}
+	
 
-	}
-	else if(Player.x < 0)
+	if(left == true && Player.x >= 32)
 	{
+		Player.x -= 32;
+		Sleep(100);
 		left = false;
-		Player.x = 0;
 	}
 
-	if(right == true && Player.x < 606)
+	if(right == true && Player.x <= 608)
 	{
-		Player.x += Player.Velocity;
-	}
-	else if(Player.x > 606)
-	{
+		Player.x += 32;
+		Sleep(100);
 		right = false;
-		Player.x = 606;
 	}
 
 	if(up == true && Player.y > 0)
 	{
-		Player.y -= Player.Velocity;
-	}
-	else if(Player.y < 0)
-	{
-		up = false;
-		Player.y = 0;
+		Player.y -= 32;
+		Sleep(100);
 	}
 
-	if(down == true && Player.y < 446)
+	if(down == true && Player.y < 480)
 	{
-		Player.y += Player.Velocity;
-	}
-	else if(Player.y > 446)
-	{
-		down = false;
-		Player.y = 446;
-	}
-	/*
-	for(int i = 0; i < 3; i++)
-	{
-		for(col = 0; col < zone.room[i].cube.size(); col++)
-		{
-			SelectObject(Tiles_DC,Tile.hApple);
-			BitBlt(BackBuffer, zone.room[i].cube.at(col).x, zone.room[i].cube.at(col).y, 
-			Tile.Apple.bmWidth, Tile.Apple.bmHeight, Tiles_DC, 0, 0, SRCAND);
-		}
-	}*/
-
-	// bag of nuts
-	for(col = 0; col < 3; col++)
-	{
-		for(row = 0; row < 3; row++)
-		{
-			if(Bag[col][row] == 1)
-			{
-				SelectObject(Tiles_DC,Tile.hApple);
-				BitBlt(BackBuffer, 547 + col*Tile.Apple.bmWidth, 0 + row*Tile.Apple.bmHeight, 
-				Tile.Apple.bmWidth, Tile.Apple.bmHeight, Tiles_DC, 0, 0, SRCAND);
-			}
-		}
+		Player.y += 32;
+		Sleep(100);
 	}
 
 	// Render map
@@ -356,12 +343,21 @@ bool CGraphics::Paint()
 	{
 		for(row = 0; row < row_size; row++)
 		{
+
+			//SelectObject(Tiles_DC,Tile.hApple);
+
+			//BitBlt(BackBuffer, col*Tile.Apple.bmWidth, row*Tile.Apple.bmWidth, 
+			//Tile.Apple.bmWidth, Tile.Apple.bmHeight, Tiles_DC, 0, 0, SRCCOPY);
+   // //    Restoring the original object
+   // SelectObject(Tiles_DC,original);			
 			if(levelFigure[col][row] == 3)
 			{
 				SelectObject(Tiles_DC,Tile.hApple);
 
 				BitBlt(BackBuffer, col*Tile.Apple.bmWidth, row*Tile.Apple.bmWidth, 
 					Tile.Apple.bmWidth, Tile.Apple.bmHeight, Tiles_DC, 0, 0, SRCCOPY);
+				    //    Restoring the original object
+    SelectObject(Tiles_DC,original);
 			}
 			else
 			if(levelFigure[col][row] == 1)
@@ -374,24 +370,41 @@ bool CGraphics::Paint()
 		}
 	}
 
-	///////////////////////////////////////////////
-	FillRect(BackBuffer, &object, (HBRUSH)GetStockObject(WHITE_BRUSH));
+	// Drawing the bag with collected food
+	for(col = 0; col < 3; col++)
+	{
+		for(row = 0; row < 3; row++)
+		{
+			if(Bag[col][row] == 1)
+			{
+				SelectObject(Tiles_DC,Tile.hApple);
+				BitBlt(BackBuffer, 547 + col*Tile.Apple.bmWidth, 0 + row*Tile.Apple.bmHeight, 
+				Tile.Apple.bmWidth, Tile.Apple.bmHeight, Tiles_DC, 0, 0, SRCAND);
+				    //    Restoring the original object
+    SelectObject(Tiles_DC,original);
+			}
+		}
+	}
 
-	if(Player.x > 600)
+	///////////////////////////////////////////////
+	//FillRect(BackBuffer, &object, (HBRUSH)GetStockObject(WHITE_BRUSH));
+
+	if(Player.x >= (640 - 96))
 	{
 		EmptyBag();
 		Player.Capacity = 9;
-		if (! LoadMap(main_window_handle,"level1.txt" ) )
+		/*if (! LoadMap(main_window_handle,"level1.txt" ) )
 		{
 			MessageBox(main_window_handle, TEXT("Error in opening level file\n"), TEXT("Error"), MB_ICONERROR | MB_OK);
 			return false;
-		}
+		} */
 	}
 					
 	SelectObject(Tiles_DC,Player.hIcon);
 
 	BitBlt(BackBuffer, Player.x, Player.y, Player.Icon.bmWidth, Player.Icon.bmHeight, Tiles_DC, 0, 0, SRCAND);	
-
+	    //    Restoring the original object
+    SelectObject(Tiles_DC,original);
 
 	//Page flipping
 	BitBlt(gDC, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), BackBuffer, 0, 0, SRCCOPY);
@@ -399,45 +412,44 @@ bool CGraphics::Paint()
 	//fps counter
 	Status();
 
+    //    Restoring the original object
+    SelectObject(Tiles_DC,original);
+
 	return true;
 }
+
+#define BAD_NUT 3
+#define GOOD_NUT 1
+#define EMPTY_NUT 0;
 
 bool CGraphics::Collecting(int x, int y)
 {
 	if(Player.Capacity == 0)
 	{
-		TextOut(BackBuffer,200,460,"You must drop of collected nuts", strlen("You must drop of collected nuts"));
+		TextOut(BackBuffer,0,480 - 64,"You must drop of collected nuts", strlen("You must drop of collected nuts"));
 		return false;
 	}
-	if(levelFigure[x][y] == 3)
+
+	if(levelFigure[x][y] == BAD_NUT)
 	{
 		Player.Score -= 1000;
 		Player.nuts += 1;
 		Player.Capacity -= 1;
-		object.top += 10;
+		//object.top += 10;
 		Player.Badnut = true;
-		levelFigure[x][y] = 0;
+		levelFigure[x][y] = EMPTY_NUT;
 		SquirrelSick();
 		FillBag();
 		return true;
 	}
-	if(levelFigure[x][y] == 1)
+	if(levelFigure[x][y] == GOOD_NUT)
 	{
-		//if(left)
-		//	Player.x--;
-		//if(right)
-		//	Player.x++;
-		//if(up)
-		//	Player.y--;
-		//if(down)
-		//	Player.y++;
-		
 		Player.Score += 200;
 		Player.nuts += 1;
 		Player.Capacity -= 1;
-		Player.x += 8;
-		object.top -= 1;
-		levelFigure[x][y] = 0;
+		//Player.x += 8;
+		//object.top -= 1;
+		levelFigure[x][y] = EMPTY_NUT;
 		Player.Badnut = false;
 		SquirrelSick();
 		FillBag();
@@ -456,7 +468,10 @@ bool CGraphics::Status()
 bool CGraphics::GameFinished()
 {
 	if(Player.Score == 1000)
-		LoadMap(main_window_handle,"level2.txt" );
+	{
+		//LoadMap(main_window_handle,"level2.txt" );
+		//init_map(main_window_handle, "level1.txt");
+	}
 	return true;
 }
 
@@ -492,7 +507,6 @@ bool CGraphics::FillBag()
 		Bag[2][1] = 1;
 	if(Player.Capacity == 0)
 		Bag[2][2] = 1;
-
 
 	return true;
 }

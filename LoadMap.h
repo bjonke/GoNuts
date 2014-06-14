@@ -6,10 +6,25 @@ using namespace std;
 
 #include "pod_room.h"
 
-int	levelFigure[200][200];
+int	levelFigure[100][100];
+#define MAP_X_SIZE 100;
+#define MAP_Y_SIZE 100;
+#define GOOD_NUT 1;
 int col_size;
 int row_size;
-//pod_room room[200][200];
+
+void init_map(HWND hwnd, char *map_file)
+{
+	int _x=0,_y=0;
+
+	for(_x = 0; _x < 100; _x++)
+	{
+		for(_y = 0; _y < 100; _y++)
+		{
+			levelFigure[_x][_y] = GOOD_NUT;
+		}
+	}
+}
 
 BOOL LoadMap(HWND hwnd, char *MapFile)
 {

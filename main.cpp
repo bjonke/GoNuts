@@ -41,7 +41,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	if (!RegisterClass (&wndclass))
 	{
-		MessageBox (NULL, TEXT ("This program requires a advanced windows"),
+		MessageBox (NULL, TEXT ("Failed to register the windows class."),
 					szAppName, MB_ICONERROR) ;
 		return 0;
 	}
@@ -51,7 +51,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// Huvudfönstret
 	hwnd = CreateWindow (szAppName,		// Window class name
 						 szAppName,	//window caption
-						 WS_POPUP | WS_BORDER,
+						 WS_OVERLAPPEDWINDOW,
 						 0,
 						 0,
 						 ClientSizeX,
