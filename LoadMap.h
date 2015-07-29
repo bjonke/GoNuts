@@ -6,10 +6,12 @@ using namespace std;
 
 #include "pod_room.h"
 
-int	levelFigure[100][100];
+
 #define MAP_X_SIZE 100;
 #define MAP_Y_SIZE 100;
 #define GOOD_NUT 1;
+
+int levelFigure[100][100];
 int col_size;
 int row_size;
 
@@ -28,9 +30,9 @@ void init_map(HWND hwnd, char *map_file)
 
 BOOL LoadMap(HWND hwnd, char *MapFile)
 {
-	int		col;
-	int		row;
-	char	c;
+	int col;
+	int row;
+	char c;
 
 	col_size = 0;
 	row_size = 0;
