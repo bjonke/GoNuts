@@ -26,10 +26,10 @@ public:
 	int done;
 	int nFPS;
 
-   cTiming();                        // Constructor 
-   void StartTimer();
-   void Wait(int MaxFrameRate);
-   void FPSloop();
+	cTiming();                        // Constructor 
+	void StartTimer();
+	void Wait(int MaxFrameRate);
+	void FPSloop();
 	int GetTicksToWait();
 }; 
 #endif
