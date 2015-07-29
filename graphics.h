@@ -18,7 +18,6 @@ public:
 
 	LARGE_INTEGER startFrame;
 	LARGE_INTEGER stopFrame;
-//	LARGE_INTEGER currentTick;
 	LARGE_INTEGER nFrames;
 	LARGE_INTEGER tickstowait;
 	LARGE_INTEGER tickspassed;
@@ -38,36 +37,20 @@ public:
 	int y;
 
 	int velocity;
-//	int velocity_up;
-//	int velocity_down;
-//	int velocity_left;
-//	int velocity_right;
-//	int velocity_hori;
-//	int velocity_vert;
+
 	bool Init(HWND hwnd);
 	bool Paint();
-	//bool Paint(HWND hwnd);
 	bool Collecting(int x, int y);
 	bool SquirrelSick();
-	//bool SquirrelSick(HWND hwnd);
 	bool FillBag();
-	//bool FillBag(HWND hwnd);
 	void EmptyBag();
-	//void EmptyBag(HWND hwnd);
 	bool Status();
-	//bool Status(HWND hwnd);
 	bool GameFinished();
-	//bool GameFinished(HWND hwnd);
-	//void EraseScreen(HWND hwnd);
 	void EraseScreen();
-	//void Text(HWND hwnd);
 	void Text();
 	void Menu();
-	//void Menu(HWND hwnd);
 	bool Input();
-	//void Input(HWND hwnd);
 	void SplashScreen();
-	//void SplashScreen(HWND hwnd);
 	void RandomTest();
 
 	CGraphics();
