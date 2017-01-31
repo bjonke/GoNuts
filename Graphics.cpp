@@ -1,550 +1,274 @@
+//--------------------------------------------
+//	INCLUDES
+//--------------------------------------------
 #include <iostream>
-#include <ctime>
-#include <cstdio>
-using namespace std;
-#include <windows.h>
-#include "CVector.h"
 #include "graphics.h"
-#include "timing.h"
-#include "LoadMap.h"
-#include "Clevels.h"
-#include "pod_cube.h"
-#include "pod_room.h"
-#include "world.h"
-/*--------------------------------------------
-	GLOBALS
-----------------------------------------------*/
+#include "input.h"
 
-struct PLAYER
+//--------------------------------------------
+//	GLOBALS
+//--------------------------------------------
+
+// Handle to Tiles device context
+//HDC Tiles_DC = 0;
+// Main graphic handle to device context
+//HDC gDC = 0;
+
+//--------------------------------------------
+//	BACK(double) BUFFERING
+//--------------------------------------------
+
+// Handle to BackBuffer context
+//HDC		BackBuffer = 0;
+//HBITMAP BackBuffer_bmp = 0;
+//HBITMAP Old_bmp = 0;
+//--------------------------------------------
+
+//RECT rect;
+
+PlayerSDL Player;
+InputSDL* Logic = 0;
+//CInput* Logic = 0;
+
+TilesSDL Tile;
+
+// Initiating everything for the start of the game
+bool GraphicsSDL::Init()
 {
-	char Name[64];
-	int x;
-	int y;
-	int Score;
-	int Velocity;
-	int PrevX;
-	int PrevY;
-	int LastX;
-	int LastY;
-	double nuts;
-	HBITMAP hIcon;
-	BITMAP Icon;
-	
-	int Capacity;
-	bool Badnut;
-	
-} Player;
+	//main_window_handle = chwnd;
 
-// handle till minnes device context
-HDC Tiles_DC = NULL;
-struct TILES
-{
-	HBITMAP h_img_background;
-	BITMAP img_background;
-	HBITMAP hApple;
-	BITMAP Apple;
-	HBITMAP hBanana;
-	BITMAP Banana;
-	HBITMAP hWall;
-	HBITMAP hExit;
-	BITMAP Wall;
-	BITMAP Exit;
+	//Logic = new CInput(FieldSize,FieldSize);
+	Logic = new InputSDL(FieldSize,FieldSize);
 
-	HBITMAP hIntro;
-	BITMAP Intro;
-} Tile;
+	// Den anvÃ¤nds av bÃ¥de player 1 och 2
 
-RECT rect;
-RECT clear;
-RECT object;
-RECT player;
-// For main handle to device context
-HDC gDC = 0;
-// for back (double) buffering
+	//Player.hIcon = (HBITMAP)LoadImage(NULL,"Badger.bmp",
+	//	IMAGE_BITMAP, 0, 0,	LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 
-HDC		BackBuffer = 0;	
-HBITMAP BackBuffer_bmp = 0;
-HBITMAP Old_bmp = 0;
+	//GetObject(Player.hIcon,sizeof(BITMAP), &Player.Icon);
 
-static int Bag[3][3];
-
-cTiming FPScounter;
-
-world zone;
-
-bool CGraphics::Init(HWND hwnd)
-{
-	zone.populate();
-	main_window_handle = hwnd;
-
-	CLevels* leveltest = 0;
-
-	Player.Badnut = false;
-
-	QueryPerformanceFrequency(&ticksPerSecond);
-	QueryPerformanceFrequency(&FPScounter.ticksPerSecond);
-
-	// Load map and display Messagebox if error
-	if (! LoadMap(hwnd,"level1.txt" ) )
-	{
-		MessageBox(hwnd, TEXT("Error in opening level file\n"), TEXT("Error"), MB_ICONERROR | MB_OK);
-		return false;
-	}
-
-	//init_map(hwnd, "level1.txt");
-	// Setting bools for movement to false so there is no movement
-	up = false;
-	down = false;
-	right = false;
-	left = false;
-
-	velocity = 10;
-	Player.Velocity = 1;
-	col = 0;
-	row = 0;
-	x = 0;
-	y = 0;
-	Player.nuts = 0;
-	Player.Capacity = 9;
-	showmenu = false;
+	//------------------------------------------------------------------
+	// Splash screen stuff
+	//------------------------------------------------------------------
 	Splash = true;
 
-	//squrl
-	Player.x = 0;
-	Player.y = 0;
+	//Tile.hIntro = (HBITMAP)LoadImage(NULL, "Splash.bmp",
+	//	IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 
-	gDC = GetDC(hwnd);
 
-	// För BackBuffer (Dubbel) buffring
-	BackBuffer = CreateCompatibleDC(gDC);
-	BackBuffer_bmp = CreateCompatibleBitmap(gDC, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
-	Old_bmp = (HBITMAP)SelectObject(BackBuffer, BackBuffer_bmp);
+	ShowMenu = true;
+
+	//gDC = GetDC(main_window_handle);
+
+	// FÃ¶r BackBuffer (Dubbel) buffring
+	//BackBuffer = CreateCompatibleDC(gDC);
+	//BackBuffer_bmp = CreateCompatibleBitmap(gDC, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+	//Old_bmp = (HBITMAP)SelectObject(BackBuffer, BackBuffer_bmp);
 
 	//-------------------------------------------------------------------
-		// Ladddar in bmp bilder för alla objekt i spelet
-
-	// renaming apples to acorns instead, remove the image file for this later.
-	Tile.h_img_background = (HBITMAP)LoadImage(NULL, "background.bmp",
-                                    IMAGE_BITMAP, 0, 0,
-                                    LR_CREATEDIBSECTION | LR_LOADFROMFILE);
-	if( Tile.h_img_background == 0 )
-	{
-		MessageBox(hwnd,TEXT("Error, no background.bmp in directory\n"), TEXT("Error"),MB_ICONERROR | MB_OK);
-		return false;
-	}
+	// Ladddar in bmp bilder fÃ¶r alla objekt i spelet
 
 
-	Player.hIcon = (HBITMAP)LoadImage(NULL,"Squirrel.bmp",
-										IMAGE_BITMAP, 0, 0,
-										LR_CREATEDIBSECTION | LR_LOADFROMFILE);
-	if( Player.hIcon == 0 )
-	{
-		MessageBox(hwnd,TEXT("Error, no player.bmp in directory\n"), TEXT("Error"),MB_ICONERROR | MB_OK);
-		return false;
-	}
+	//Tile.hBadAcorn = (HBITMAP)LoadImage(NULL, "BadAcorns.bmp",
+    //                                IMAGE_BITMAP, 0, 0,
+    //                                LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 
-	// renaming apples to acorns instead, remove the image file for this later.
-	Tile.hApple = (HBITMAP)LoadImage(NULL, "acorns.bmp",
-                                    IMAGE_BITMAP, 0, 0,
-                                    LR_CREATEDIBSECTION | LR_LOADFROMFILE);
-	if( Tile.hApple == 0 )
-	{
-		MessageBox(hwnd,TEXT("Error, no Apple.bmp in directory\n"), TEXT("Error"),MB_ICONERROR | MB_OK);
-		return false;
-	}
+	//Tile.hAcorn = (HBITMAP)LoadImage(NULL, "Acorns.bmp",
+    //                                IMAGE_BITMAP, 0, 0,
+    //                                LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 
-	// renaming bananas to acorns instead, remove the image file for this later.
-	Tile.hBanana = (HBITMAP)LoadImage(NULL, "acorns.bmp",
-                                    IMAGE_BITMAP, 0, 0,
-                                    LR_CREATEDIBSECTION | LR_LOADFROMFILE);
-	if( Tile.hBanana == 0 )
-	{
-		MessageBox(hwnd,TEXT("Error, no Banana.bmp in directory\n"), TEXT("Error"),MB_ICONERROR | MB_OK);
-		return false;
-	}
+	// FÃ¶r BackBuffer (Dubbel) buffring
+	//BackBuffer = CreateCompatibleDC(gDC);
+	//BackBuffer_bmp = CreateCompatibleBitmap(gDC, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+	//Old_bmp = (HBITMAP)SelectObject(BackBuffer, BackBuffer_bmp);
 
-	Tile.hIntro = (HBITMAP)LoadImage(NULL, "Splash.bmp",
-                                    IMAGE_BITMAP, 0, 0,
-                                    LR_CREATEDIBSECTION | LR_LOADFROMFILE);
-	if( Tile.hIntro == 0 )
-	{
-		MessageBox(hwnd,TEXT("Error, no Banana.bmp in directory\n"), TEXT("Error"),MB_ICONERROR | MB_OK);
-		return false;
-	}
-	
-	Tiles_DC = CreateCompatibleDC(NULL);
+	//Tiles_DC = CreateCompatibleDC(NULL);
 
-	GetObject(Tile.h_img_background,sizeof(BITMAP), &Tile.img_background);
 
-	GetObject(Player.hIcon,sizeof(BITMAP), &Player.Icon);
-	GetObject(Tile.hWall, sizeof(BITMAP), &Tile.Wall);
-	GetObject(Tile.hExit, sizeof(BITMAP), &Tile.Exit);
-	GetObject(Tile.hIntro, sizeof(BITMAP), &Tile.Intro);
-	GetObject(Tile.hApple, sizeof(BITMAP), &Tile.Apple);
-	GetObject(Tile.hBanana, sizeof(BITMAP), &Tile.Banana);
-
+	//GetObject(Tile.hIntro, sizeof(BITMAP), &Tile.Intro);
+	//GetObject(Tile.hBadAcorn, sizeof(BITMAP), &Tile.BadAcorn);
+	//GetObject(Tile.hAcorn, sizeof(BITMAP), &Tile.Acorn);
 
 	return true;
 }
 
-void CGraphics::EraseScreen()
+void GraphicsSDL::EraseScreen()
 {
-	ValidateRect(main_window_handle,&clear);
-	GetClientRect(main_window_handle,&clear);
-	FillRect(BackBuffer, &clear, (HBRUSH)GetStockObject(WHITE_BRUSH));
+	//ValidateRect(main_window_handle,&rect);
+	//GetClientRect(main_window_handle,&rect);
+	//FillRect(BackBuffer, &rect, (HBRUSH)GetStockObject(WHITE_BRUSH));
 }
 
-void CGraphics::SplashScreen()
+void GraphicsSDL::SplashScreen()
 {
-	SelectObject(Tiles_DC,Tile.hIntro);
-	BitBlt(BackBuffer, 0, 0, 
-	Tile.Intro.bmWidth, Tile.Intro.bmHeight, Tiles_DC, 0, 0, SRCCOPY);
-
-	BitBlt(gDC, 0, 0, GetSystemMetrics(SM_CXSCREEN), 
-	GetSystemMetrics(SM_CYSCREEN), BackBuffer, 0, 0, SRCCOPY);
-
-	if(KEY_DOWN(VK_SPACE))
-		Splash = false;
 }
 
-void CGraphics::RandomTest()
+void GraphicsSDL::Menu()
 {
-	//int thing = Random() % 2;
-	for(col = 0; col < 15; col++)
+	if(ShowMenu)
 	{
-		for(row = 0; row < 20; row++)
-		{
-			//hämtar in tecken
-			//char c = Map_file.get();
-			//konverterar tecknet till integer
-			//levelFigure[row][col] = atoi(&c);
-		}
-	}
-}
-void CGraphics::Menu()
-{
-	if(showmenu)
-	{
+        /*
 		SetTextColor(BackBuffer,RGB(255,0,0));
 		SetBkColor(BackBuffer,RGB(255,255,255));
 
 		GetClientRect(main_window_handle,&rect);
 
 		rect.top = 240;
-		DrawText(BackBuffer,"1.Start\n2.Restart\n3.Exit",-1,&rect, DT_CENTER);
+
+		if(MenuChoiceOne == 0)
+		{
+ 			DrawText(BackBuffer,"1.Start\n2.Restart\n3.Exit",-1,&rect, DT_CENTER);
+		}
+		else
+		{
+			DrawText(BackBuffer,"1.Return to game\n2.Restart\n3.Exit",-1,&rect, DT_CENTER);
+		}
+
+
 
 		SetTextColor(BackBuffer,RGB(255,255,255));
 
-		if(KEY_DOWN(0x31))
+
+		if(KEY_DOWN('1'))
 		{
-			LoadMap(main_window_handle,"level2.txt");
-			//init_map(main_window_handle, "level1.txt");
-		//	Init(main_window_handle);
-		}
-		if(KEY_DOWN(0x32))
-		{
-		}
-		if(KEY_DOWN(0x33))
-		{
-			showmenu = false;
+			if(!Logic->CheckForAcorns())
+				Logic->SpreadAcorns();
+			MenuChoiceOne = 1;
+			ShowMenu = false;
 		}
 
-		BitBlt(gDC, 0, 0, GetSystemMetrics(SM_CXSCREEN), 
+		if(KEY_DOWN('2'))
+		{
+			Logic->Reset();
+			ShowMenu = false;
+		}
+
+		if(KEY_DOWN('3'))
+		{
+			PostQuitMessage(0);
+		}
+
+		BitBlt(gDC, 0, 0, GetSystemMetrics(SM_CXSCREEN),
 			GetSystemMetrics(SM_CYSCREEN), BackBuffer, 0, 0, SRCCOPY);
+			*/
 	}
 }
 
-bool CGraphics::Input()
+void GraphicsSDL::Input()
 {
-	if(KEY_DOWN(VK_ESCAPE))
+	Logic->KeyPress();
+	Logic->Collecting();
+	Logic->Sick();
+	if(!Logic->CheckForAcorns())
 	{
-		PostQuitMessage(0);
-		return true;
+		GameFinished();
+		Logic->Reset();
+		ShowMenu = true;
 	}
-
-	if(KEY_DOWN(VK_UP))
-		up = true;
-	if(KEY_UP(VK_UP))
-		up = false;
-
-	if(KEY_DOWN(VK_DOWN))
-		down = true;
-	if(KEY_UP(VK_DOWN))
-		down = false;
-
-	if(KEY_DOWN(VK_RIGHT))
-		right = true;
-	if(KEY_UP(VK_RIGHT))
-		right = false;
-
-	if(KEY_DOWN(VK_LEFT))
-		left = true;
-	if(KEY_UP(VK_LEFT))
-		left = false;
-	return true;
-	
-	if(KEY_DOWN(VK_F3))
-		showmenu = true;
-	return false;
 }
 
-bool CGraphics::Paint()
+bool GraphicsSDL::Render()
 {
-    //    Initializing original object
-    HGDIOBJ original = NULL;
-	//    Saving the original object
-    original = SelectObject(Tiles_DC,GetStockObject(DC_PEN));
-
-	SelectObject(Tiles_DC,Tile.h_img_background);
-	BitBlt(BackBuffer, 0, 0, Tile.img_background.bmWidth, Tile.img_background.bmHeight, Tiles_DC, 0, 0, SRCCOPY);
-
-	BitBlt(gDC, 0, 0, GetSystemMetrics(SM_CXSCREEN), 
-	GetSystemMetrics(SM_CYSCREEN), BackBuffer, 0, 0, SRCCOPY);
-	//    Restoring the original object
-    SelectObject(Tiles_DC,original);
-
-	FPScounter.StartTimer();
-	//velocity test
-	x = Player.x;
-	y = Player.y;
-	Player.PrevX = Player.x;
-	Player.PrevY = Player.y;
-	Player.Velocity = velocity;
-	
-
-	if(left == true && Player.x >= 32)
+	// Renders the different Acorns on the playing field to the backbbuffer
+	for(Col = 0; Col < FieldX; Col++)
 	{
-		Player.x -= 32;
-		Sleep(100);
-		left = false;
-	}
-
-	if(right == true && Player.x <= 608)
-	{
-		Player.x += 32;
-		Sleep(100);
-		right = false;
-	}
-
-	if(up == true && Player.y > 0)
-	{
-		Player.y -= 32;
-		Sleep(100);
-	}
-
-	if(down == true && Player.y < 480)
-	{
-		Player.y += 32;
-		Sleep(100);
-	}
-
-	// Render map
-	for(col = 0; col < col_size; col++)
-	{
-		for(row = 0; row < row_size; row++)
+		for(Row = 0; Row < FieldY; Row++)
 		{
-
-			//SelectObject(Tiles_DC,Tile.hApple);
-
-			//BitBlt(BackBuffer, col*Tile.Apple.bmWidth, row*Tile.Apple.bmWidth, 
-			//Tile.Apple.bmWidth, Tile.Apple.bmHeight, Tiles_DC, 0, 0, SRCCOPY);
-   // //    Restoring the original object
-   // SelectObject(Tiles_DC,original);			
-			if(levelFigure[col][row] == 3)
+			if(Logic->AcornField[Col][Row] == 3)
 			{
-				SelectObject(Tiles_DC,Tile.hApple);
+				//SelectObject(Tiles_DC,Tile.hBadAcorn);
 
-				BitBlt(BackBuffer, col*Tile.Apple.bmWidth, row*Tile.Apple.bmWidth, 
-					Tile.Apple.bmWidth, Tile.Apple.bmHeight, Tiles_DC, 0, 0, SRCCOPY);
-				    //    Restoring the original object
-    SelectObject(Tiles_DC,original);
+				//BitBlt(BackBuffer, Col*Tile.BadAcorn.bmWidth, Row*Tile.BadAcorn.bmWidth,
+				//	Tile.BadAcorn.bmWidth, Tile.BadAcorn.bmHeight, Tiles_DC, 0, 0, SRCCOPY);
 			}
-			else
-			if(levelFigure[col][row] == 1)
+			if(Logic->AcornField[Col][Row] == 1)
 			{
-				SelectObject(Tiles_DC,Tile.hBanana);
+				//SelectObject(Tiles_DC,Tile.hAcorn);
 
-				BitBlt(BackBuffer, col*Tile.Banana.bmWidth, row*Tile.Banana.bmWidth, 
-					Tile.Banana.bmWidth, Tile.Banana.bmHeight, Tiles_DC, 0, 0, SRCCOPY);
+				//BitBlt(BackBuffer, Col*Tile.Acorn.bmWidth, Row*Tile.Acorn.bmWidth,
+				//	Tile.Acorn.bmWidth, Tile.Acorn.bmHeight, Tiles_DC, 0, 0, SRCCOPY);
 			}
 		}
 	}
-
-	// Drawing the bag with collected food
-	for(col = 0; col < 3; col++)
-	{
-		for(row = 0; row < 3; row++)
-		{
-			if(Bag[col][row] == 1)
-			{
-				SelectObject(Tiles_DC,Tile.hApple);
-				BitBlt(BackBuffer, 547 + col*Tile.Apple.bmWidth, 0 + row*Tile.Apple.bmHeight, 
-				Tile.Apple.bmWidth, Tile.Apple.bmHeight, Tiles_DC, 0, 0, SRCAND);
-				    //    Restoring the original object
-    SelectObject(Tiles_DC,original);
-			}
-		}
-	}
-
 	///////////////////////////////////////////////
-	//FillRect(BackBuffer, &object, (HBRUSH)GetStockObject(WHITE_BRUSH));
 
-	if(Player.x >= (640 - 96))
-	{
-		EmptyBag();
-		Player.Capacity = 9;
-		/*if (! LoadMap(main_window_handle,"level1.txt" ) )
-		{
-			MessageBox(main_window_handle, TEXT("Error in opening level file\n"), TEXT("Error"), MB_ICONERROR | MB_OK);
-			return false;
-		} */
-	}
-					
-	SelectObject(Tiles_DC,Player.hIcon);
+	// Selects the Player bitmap and paints the player in the backbuffer
+	//SelectObject(Tiles_DC,Player.hIcon);
 
-	BitBlt(BackBuffer, Player.x, Player.y, Player.Icon.bmWidth, Player.Icon.bmHeight, Tiles_DC, 0, 0, SRCAND);	
-	    //    Restoring the original object
-    SelectObject(Tiles_DC,original);
+	//BitBlt(BackBuffer, Logic->Xloc(), Logic->Yloc(), Player.Icon.bmWidth, Player.Icon.bmHeight, Tiles_DC, 0, 0, SRCAND);
+
+	//BitBlt(BackBuffer, Logic->Xloc2(), Logic->Yloc2(), Player.Icon.bmWidth, Player.Icon.bmHeight, Tiles_DC, 0, 0, SRCAND);
+	////////////////////////////////////////////////////////
 
 	//Page flipping
-	BitBlt(gDC, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), BackBuffer, 0, 0, SRCCOPY);
-
-	//fps counter
-	Status();
-
-    //    Restoring the original object
-    SelectObject(Tiles_DC,original);
+	//BitBlt(gDC, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), BackBuffer, 0, 0, SRCCOPY);
 
 	return true;
 }
 
-#define BAD_NUT 3
-#define GOOD_NUT 1
-#define EMPTY_NUT 0;
-
-bool CGraphics::Collecting(int x, int y)
+void GraphicsSDL::GameFinished()
 {
-	if(Player.Capacity == 0)
-	{
-		TextOut(BackBuffer,0,480 - 64,"You must drop of collected nuts", strlen("You must drop of collected nuts"));
-		return false;
-	}
+    /*
+	SetTextColor(BackBuffer,RGB(255,0,0));
+	SetBkColor(BackBuffer,RGB(255,255,255));
 
-	if(levelFigure[x][y] == BAD_NUT)
-	{
-		Player.Score -= 1000;
-		Player.nuts += 1;
-		Player.Capacity -= 1;
-		//object.top += 10;
-		Player.Badnut = true;
-		levelFigure[x][y] = EMPTY_NUT;
-		SquirrelSick();
-		FillBag();
-		return true;
-	}
-	if(levelFigure[x][y] == GOOD_NUT)
-	{
-		Player.Score += 200;
-		Player.nuts += 1;
-		Player.Capacity -= 1;
-		//Player.x += 8;
-		//object.top -= 1;
-		levelFigure[x][y] = EMPTY_NUT;
-		Player.Badnut = false;
-		SquirrelSick();
-		FillBag();
-		return true;
-	}
-	return false;
-}
+	GetClientRect(main_window_handle,&rect);
+	rect.top = 240;
 
-bool CGraphics::Status()
-{
-	//FPScounter.Wait(60);
-//	FPScounter.FPSloop();
-	return true;
-}
-
-bool CGraphics::GameFinished()
-{
-	if(Player.Score == 1000)
+	if( Logic->GameFinished() == 1)
 	{
-		//LoadMap(main_window_handle,"level2.txt" );
-		//init_map(main_window_handle, "level1.txt");
-	}
-	return true;
-}
-
-bool CGraphics::SquirrelSick()
-{
-	if(Player.Badnut)
-	{
-		TextOut(BackBuffer,450,300,"SICK!",strlen("SICK!"));
-		velocity = 4;
+		DrawText(BackBuffer,"Player 1 won!\nPress Space to return to menu",-1,&rect, DT_CENTER);
 	}
 	else
-		velocity = 4;
-	return true;
-}
-
-bool CGraphics::FillBag()
-{
-	if(Player.Capacity == 8)
-		Bag[0][0] = 1;
-	if(Player.Capacity == 7)
-		Bag[0][1] = 1;
-	if(Player.Capacity == 6)
-		Bag[0][2] = 1;
-	if(Player.Capacity == 5)
-		Bag[1][0] = 1;
-	if(Player.Capacity == 4)
-		Bag[1][1] = 1;
-	if(Player.Capacity == 3)
-		Bag[1][2] = 1;
-	if(Player.Capacity == 2)
-		Bag[2][0] = 1;
-	if(Player.Capacity == 1)
-		Bag[2][1] = 1;
-	if(Player.Capacity == 0)
-		Bag[2][2] = 1;
-
-	return true;
-}
-
-//Resetting the bag to be empty
-void CGraphics::EmptyBag()
-{
-	for(col = 0; col < 3; col++)
 	{
-		for(row = 0; row < 3; row++)
-		{
-			if(Bag[col][row] == 1)
-			{
-				Bag[col][row] = 0;
-			}
-		}
+		DrawText(BackBuffer,"Player 2 won!\nPress Space to return to menu",-1,&rect, DT_CENTER);
 	}
+
+	BitBlt(gDC, 0, 0, GetSystemMetrics(SM_CXSCREEN),
+	GetSystemMetrics(SM_CYSCREEN), BackBuffer, 0, 0, SRCCOPY);
+
+	while(!KEY_DOWN(VK_SPACE))
+	{
+	}
+    */
+	ShowMenu = true;
 }
 
-void CGraphics::Text()
+void GraphicsSDL::Text()
 {
+    /*
 	char buffer[100];
 
-	RECT TextWindow;
-	TextWindow.bottom = 500;
-	TextWindow.top = 100;
-	TextWindow.left =	520;
-	TextWindow.right = 640;
+	RECT PlayerStats;
+	RECT Player2Stats;
+
+	PlayerStats.bottom = 505;
+	PlayerStats.top = 485;
+	PlayerStats.left =	0;
+	PlayerStats.right = 320;
+
+	Player2Stats.bottom = 505;
+	Player2Stats.top = 485;
+	Player2Stats.left =	320;
+	Player2Stats.right = 640;
 
 	SetTextColor(BackBuffer,RGB(255,0,0));
 	SetBkColor(BackBuffer,RGB(255,255,255));
 
-	sprintf(buffer,"Score: %d",Player.Score);
-	DrawText(BackBuffer,buffer,-1,&TextWindow, 0);
-	sprintf(buffer,"\nNuts: %.0f", Player.nuts);
-	DrawText(BackBuffer,buffer,-1, &TextWindow, 0);
+	sprintf(buffer,"Player 1 Score: %d Acorns: %d",Logic->Score(), Logic->Acorns());
+	DrawText(BackBuffer,buffer,-1,&PlayerStats, 0);
+
+	sprintf(buffer,"Player 2 Score: %d Acorns: %d",Logic->Score2(), Logic->Acorns2());
+	DrawText(BackBuffer,buffer,-1,&Player2Stats, 0);
+	*/
 }
 
-CGraphics::CGraphics()
+GraphicsSDL::GraphicsSDL(int x, int y) : FieldX(x), FieldY(y)
 {
+	//main_window_handle = 0;
+	Row = 21;
+	Col = 0;
+	ShowMenu = false;
+	Splash = true;
+	MenuChoiceOne = 0;
 }

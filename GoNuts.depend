@@ -1,0 +1,83 @@
+# depslib dependency file v1.0
+1478377069 source:/home/rickard/Documents/Badger/bitmap.cpp
+	<iostream>
+	"bitmap.h"
+	"input.h"
+
+1478376921 /home/rickard/Documents/Badger/bitmap.h
+
+1478553676 /home/rickard/Documents/Badger/input.h
+	<SDL2/SDL_image.h>
+
+1478377127 source:/home/rickard/Documents/Badger/buttons.cpp
+	<iostream>
+	"buttons.h"
+	"input.h"
+
+1478377111 /home/rickard/Documents/Badger/buttons.h
+	"bitmap.h"
+
+1478380539 source:/home/rickard/Documents/Badger/Graphics.cpp
+	<iostream>
+	"graphics.h"
+	"input.h"
+
+1478552737 /home/rickard/Documents/Badger/graphics.h
+	<iostream>
+	<SDL2/SDL.h>
+
+1478381190 source:/home/rickard/Documents/Badger/input.cpp
+	<iostream>
+	<cstdio>
+	<SDL2/SDL.h>
+	"input.h"
+
+1478989906 source:/home/rickard/Documents/Badger/main.cpp
+	<ctime>
+	<iostream>
+	<string>
+	<SDL2/SDL.h>
+	<SDL2/SDL_mixer.h>
+	<SDL2/SDL_image.h>
+
+1478377069 source:/home/rickard/Documents/GoNuts/bitmap.cpp
+	<iostream>
+	"bitmap.h"
+	"input.h"
+
+1478376921 /home/rickard/Documents/GoNuts/bitmap.h
+
+1478553676 /home/rickard/Documents/GoNuts/input.h
+	<SDL2/SDL_image.h>
+
+1478377127 source:/home/rickard/Documents/GoNuts/buttons.cpp
+	<iostream>
+	"buttons.h"
+	"input.h"
+
+1478377111 /home/rickard/Documents/GoNuts/buttons.h
+	"bitmap.h"
+
+1478380539 source:/home/rickard/Documents/GoNuts/Graphics.cpp
+	<iostream>
+	"graphics.h"
+	"input.h"
+
+1478552737 /home/rickard/Documents/GoNuts/graphics.h
+	<iostream>
+	<SDL2/SDL.h>
+
+1478381190 source:/home/rickard/Documents/GoNuts/input.cpp
+	<iostream>
+	<cstdio>
+	<SDL2/SDL.h>
+	"input.h"
+
+1485905749 source:/home/rickard/Documents/GoNuts/main.cpp
+	<ctime>
+	<iostream>
+	<string>
+	<SDL2/SDL.h>
+	<SDL2/SDL_mixer.h>
+	<SDL2/SDL_image.h>
+

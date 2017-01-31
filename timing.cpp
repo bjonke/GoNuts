@@ -1,49 +1,56 @@
-// INCLUDES 
-
-#include <windows.h> 
-//#include <mmsystem.h> 
 #include "Timing.h" 
 #include <time.h> 
 
-// GLOBALS 
-
-// CONSTRUCTORS 
-
-// Constructor 
-cTiming::cTiming() 
+CTiming::CTiming() 
 {
-	LARGE_INTEGER ticksPerSecond = {0};
-	LARGE_INTEGER tick = {0}; // a point in time
-	LARGE_INTEGER time = {0};// for converting tick into real time
+	ticksPerSecond.QuadPart = 0;
+	tick.QuadPart = 0; // a point in time
+	time.QuadPart = 0;// for converting tick into real time
 
-	LARGE_INTEGER startFrame = {0};
-	LARGE_INTEGER stopFrame = {0};
-	LARGE_INTEGER currentTick = {0};
-	LARGE_INTEGER nFrames = {0};
-	LARGE_INTEGER Ticks_To_Wait = {0};
-	LARGE_INTEGER tickspassed = {0};
-	LARGE_INTEGER ticksleft = {0};
-	LARGE_INTEGER prev_frame = {0};
+	startFrame.QuadPart = 0;
+	stopFrame.QuadPart = 0;
+	currentTick.QuadPart = 0;
+	nFrames.QuadPart = 0;
+	Ticks_To_Wait.QuadPart = 0;
+	tickspassed.QuadPart = 0;
+	ticksleft.QuadPart = 0;
+	prev_frame.QuadPart = 0;
+	framedelay.QuadPart = 0;
 
 	int done = 0;
 
+	// Global variables for measuring fps
+	lastUpdate        = 0;
+	fpsUpdateInterval = 0.5f;
+	numFrames         = 0;
+	fps               = 0;
    // Set current and previous time to the clock time at initialisation. 
    // Otherwise mDelta = mCurrentTime - mPrevious in CalculateFrameRate() will 
    // give an absurd number during its first call and screw up all the physics 
    QueryPerformanceFrequency(&ticksPerSecond); 
 }// cTiming
 
-void cTiming::StartTimer()
+void CTiming::Init()
 {
-	QueryPerformanceCounter(&startFrame);
+	QueryPerformanceCounter(&framedelay);
+	QueryPerformanceFrequency(&ticksPerSecond);
+	prev_frame.QuadPart = 0;
+	ticksleft.QuadPart = 0;
 }
 
-void cTiming::Wait(int MaxFrameRate)
+void CTiming::StartTimer()
 {
+	QueryPerformanceCounter(&startFrame);
+	//QueryPerformanceFrequency(&ticksPerSecond);
+}
+
+void CTiming::Wait(int MaxFrameRate)
+{
+	nFps = MaxFrameRate;
 	Ticks_To_Wait.QuadPart = ticksPerSecond.QuadPart/MaxFrameRate;
 }
 
-void cTiming::FPSloop()
+void CTiming::FPSloop()
 {
 	done = 0;
 	do
@@ -62,7 +69,35 @@ void cTiming::FPSloop()
 	prev_frame = time;
 }
 
-int cTiming::GetTicksToWait()
+int CTiming::GetTicksToWait()
 {
 	return (int)((__int64)Ticks_To_Wait.QuadPart);
+}
+
+// Called once for every frame
+float CTiming::UpdateFPS()
+{
+  numFrames++;
+  float currentUpdate = time.QuadPart;
+  if( currentUpdate - lastUpdate > fpsUpdateInterval )
+  {
+    fps = numFrames / (currentUpdate - lastUpdate);
+    lastUpdate = currentUpdate;
+    numFrames = 0;
+	return fps;
+  }
+  
+}
+
+float CTiming::SetSpeedFactor()
+{
+  QueryPerformanceCounter(&currentTick);
+  //This frame's length out of desired length
+  speedfactor = (float)(currentTick.QuadPart-framedelay.QuadPart)/((float)ticksPerSecond.QuadPart/nFps);
+  fps = nFps/speedfactor;
+  if (speedfactor <= 0)
+    speedfactor = 1;
+
+  framedelay = currentTick;
+  return fps;
 }

@@ -1,12 +1,8 @@
 #ifndef _TIMING_H_ 
 #define _TIMING_H_ 
 
-#include <windows.h> 
-
-// CLASSES 
-
 //! The timing class 
-class cTiming 
+class CTiming 
 { 
 public:
 
@@ -22,14 +18,27 @@ public:
 	LARGE_INTEGER tickspassed;
 	LARGE_INTEGER ticksleft;
 	LARGE_INTEGER prev_frame;
+	LARGE_INTEGER framedelay;
+
+	float         speedfactor;
 
 	int done;
-	int nFPS;
+	int nFps;
 
-	cTiming();                        // Constructor 
-	void StartTimer();
-	void Wait(int MaxFrameRate);
-	void FPSloop();
+	// Global variables for measuring fps
+	float lastUpdate;
+	float fpsUpdateInterval;
+	unsigned int  numFrames;
+	float fps;
+
+   CTiming();		// Constructor 
+   void Init();
+   void StartTimer();
+   void Wait(int MaxFrameRate);
+   float UpdateFPS();
+   void FPSloop();
 	int GetTicksToWait();
+
+	float SetSpeedFactor();
 }; 
 #endif
