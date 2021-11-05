@@ -65,10 +65,11 @@ bool GameOver()
             {
                 std::cout << "Bad or no Acorn" << std::endl;
             }
-		}
 	}
-	if(GoodAcorns == 0)
-	{
+    }
+
+    if(GoodAcorns == 0)
+    {
         return true;
     }
     else
@@ -94,10 +95,10 @@ int main(int argc, char ** argv)
 
 	for(int Col = 0; Col < FieldSize; Col++)
 	{
-		for(int Row = 0; Row < FieldSize; Row++)
-		{
-            AcornField[Row][Col] = rand() % 4;
-		}
+	    for(int Row = 0; Row < FieldSize; Row++)
+	    {
+                 AcornField[Row][Col] = rand() % 4;
+	    }
 	}
 
     // variables
@@ -147,7 +148,6 @@ int main(int argc, char ** argv)
 
     renderer = SDL_CreateRenderer(window, -1, 0);
     SDL_Surface * GameOverScreen = IMG_Load("atari-abstract-clouds.jpg");//SDL_LoadBMP("Acorns.bmp");
-    //SDL_Texture * GameOverTexture = SDL_CreateTextureFromSurface(renderer, GameOverScreen);
     SDL_FreeSurface(GameOverScreen);
 
     SDL_Surface * AcornsBMP = IMG_Load("Acorns.png");//SDL_LoadBMP("Acorns.bmp");
@@ -165,7 +165,6 @@ int main(int argc, char ** argv)
     SDL_Surface * BadgerTwoBMP = IMG_Load("Badger.png");//SDL_LoadBMP("Badger.bmp");
     SDL_Texture * BadgerTwoTexture = SDL_CreateTextureFromSurface(renderer, BadgerTwoBMP);
     SDL_FreeSurface(BadgerTwoBMP);
-
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
     // handle events
@@ -184,10 +183,10 @@ int main(int argc, char ** argv)
 
         switch (event.type)
         {
-        case SDL_QUIT:
-            quit = true;
-            break;
-		case SDL_KEYDOWN:
+            case SDL_QUIT:
+                quit = true;
+                break;
+	    case SDL_KEYDOWN:
             switch (event.key.keysym.sym)
             {
                 case SDLK_ESCAPE: quit = true; break;
@@ -230,14 +229,11 @@ int main(int argc, char ** argv)
                 r.y = TileSize*Col;
                 r.w = TileSize;
                 r.h = TileSize;
-                // Render rect
-                //SDL_RenderFillRect( renderer, &r );
-
+                
                 if( AcornField[Col][Row] == 0)
                 {
                     SDL_SetTextureBlendMode( AcornsTexture, SDL_BLENDMODE_BLEND );
                     SDL_SetTextureAlphaMod( AcornsTexture, 255 );
-                    //SDL_SetTextureAlphaMod(AcornsTexture, 255)
                     SDL_RenderCopy(renderer, AcornsTexture, NULL, &r);
 
                     if((BadgerPosition.x/TileSize == Row) && (BadgerPosition.y/TileSize == Col))
@@ -245,16 +241,16 @@ int main(int argc, char ** argv)
                         std::cout << "Acorns!!!" << std::endl;
                         Score++;
                         AcornField[Col][Row] = 3;
-                        	if ( Mix_PlayChannel(-1, positive, 0) == -1 )
-                                    return -1;
+                        if ( Mix_PlayChannel(-1, positive, 0) == -1 )
+                            return -1;
                     }
                     if((BadgerTwoPosition.x/TileSize == Row) && (BadgerTwoPosition.y/TileSize == Col))
                     {
                         std::cout << "Acorns!!!" << std::endl;
                         ScoreTwo++;
                         AcornField[Col][Row] = 3;
-                            if ( Mix_PlayChannel(-1, positive, 0) == -1 )
-                                    return -1;
+                        if ( Mix_PlayChannel(-1, positive, 0) == -1 )
+                            return -1;
                     }
                 }
                 else if( AcornField[Col][Row] == 1)
@@ -266,27 +262,20 @@ int main(int argc, char ** argv)
                         std::cout << "Blääähhh Bad Acorns!!!" << std::endl;
                         Score--;
                         AcornField[Col][Row] = 3;
-                                                	if ( Mix_PlayChannel(-1, negative, 0) == -1 )
-                                    return -1;
+                        if ( Mix_PlayChannel(-1, negative, 0) == -1 )
+                             return -1;
                     }
                     if((BadgerTwoPosition.x/TileSize == Row) && (BadgerTwoPosition.y/TileSize == Col))
                     {
                         std::cout << "Blääähhh Bad Acorns!!!" << std::endl;
                         ScoreTwo--;
-                        AcornField[Col][Row] = 3;
-                                                	if ( Mix_PlayChannel(-1, negative, 0) == -1 )
-                                    return -1;
+                        AcornField[Col][Row] = 3;                             	if ( Mix_PlayChannel(-1, negative, 0) == -1 )
+                        return -1;
                     }
                 }
                 else{}
             }
         }
-
-    //SDL_Rect testRect = {100,100,200,200};
-    //testTexture = LoadTexture("./atari.png");
-    //                    SDL_SetTextureBlendMode( testTexture, SDL_BLENDMODE_BLEND );
-
-    //SDL_RenderCopy( renderer, testTexture, NULL, &testRect );
 
         SDL_Rect r;
         r.x = BadgerPosition.x;
@@ -315,34 +304,31 @@ int main(int argc, char ** argv)
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
 
-	// clean up our resources
-	Mix_FreeChunk(wave);
-	Mix_FreeMusic(music);
+    // clean up our resources
+    Mix_FreeChunk(wave);
+    Mix_FreeMusic(music);
 
-	// quit SDL_mixer
-Mix_CloseAudio();
+    // quit SDL_mixer
+    Mix_CloseAudio();
 
     SDL_Quit();
     return 0;
 }
 
-
 SDL_Texture* LoadTexture( const std::string &str )
 {
-	// Load image as SDL_Surface
-	SDL_Surface* surface = IMG_Load( str.c_str() );
+    // Load image as SDL_Surface
+    SDL_Surface* surface = IMG_Load( str.c_str() );
 
-	// SDL_Surface is just the raw pixels
-	// Convert it to a hardware-optimzed texture so we can render it
+    // SDL_Surface is just the raw pixels
+    // Convert it to a hardware-optimzed texture so we can render it
 
-	SDL_Texture* texture = SDL_CreateTextureFromSurface( renderer, surface );
-
+    SDL_Texture* texture = SDL_CreateTextureFromSurface( renderer, surface );
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 
-	// Don't need the orignal texture, release the memory
-	SDL_FreeSurface( surface );
-
-	return texture;
+    // Don't need the orignal texture, release the memory
+    SDL_FreeSurface( surface );
+    return texture;
 };
 
 
