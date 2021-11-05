@@ -37,7 +37,6 @@ void CheckBadgerPosition()
     if(BadgerPosition.y > TileSize*FieldSize-TileSize)
         BadgerPosition.y = TileSize*FieldSize-TileSize;
 
-
     if(BadgerTwoPosition.x < 0)
         BadgerTwoPosition.x = 0;
     if(BadgerTwoPosition.y < 0)
@@ -49,7 +48,6 @@ void CheckBadgerPosition()
 }
 
 int AcornField[10][10];
-
 
 bool GameOver()
 {
@@ -81,7 +79,6 @@ bool GameOver()
 
 SDL_Texture* testTexture;
 SDL_Texture* LoadTexture( const std::string &str );
-
 SDL_Renderer * renderer;
 
 int main(int argc, char ** argv)
@@ -95,7 +92,6 @@ int main(int argc, char ** argv)
     int Score = 0;
     int ScoreTwo = 0;
 
-
 	for(int Col = 0; Col < FieldSize; Col++)
 	{
 		for(int Row = 0; Row < FieldSize; Row++)
@@ -108,42 +104,36 @@ int main(int argc, char ** argv)
 
     bool quit = false;
     SDL_Event event;
-    //int x = 288;
-    //int y = 208;
 
     // init SDL
-
     SDL_Init(SDL_INIT_VIDEO);
 
+    //Initialize SDL_mixer
+    if( Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, 2, 4096 ) == -1 )
+           return -1;
 
-	//Initialize SDL_mixer
-	if( Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, 2, 4096 ) == -1 )
-    return -1;
+    // Load our sound effect
+    wave = Mix_LoadWAV(WAV_PATH);
+    if (wave == NULL)
+	return -1;
 
-	// Load our sound effect
-	wave = Mix_LoadWAV(WAV_PATH);
-	if (wave == NULL)
-		return -1;
+    // Load our sound effect
+    positive = Mix_LoadWAV(POSITIVE_OGG_PATH);
+    if (positive == NULL)
+        return -1;
 
-	// Load our sound effect
-	positive = Mix_LoadWAV(POSITIVE_OGG_PATH);
-	if (positive == NULL)
-		return -1;
+    // Load our sound effect
+    negative = Mix_LoadWAV(NEGATIVE_OGG_PATH);
+    if (negative == NULL)
+	return -1;
 
-	// Load our sound effect
-	negative = Mix_LoadWAV(NEGATIVE_OGG_PATH);
-	if (negative == NULL)
-		return -1;
+    // Load our music
+    music = Mix_LoadMUS(MUS_PATH);
+    if (music == NULL)
+        return -1;
 
-	// Load our music
-	music = Mix_LoadMUS(MUS_PATH);
-	if (music == NULL)
-return -1;
-
-
-
-	if ( Mix_PlayMusic( music, -1) == -1 )
-return -1;
+    if ( Mix_PlayMusic( music, -1) == -1 )
+        return -1;
 
     SDL_Window * window = SDL_CreateWindow("GoNuts",
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, TileSize*FieldSize, TileSize*FieldSize, 0);
@@ -156,11 +146,6 @@ return -1;
     SDL_FreeSurface(surface);
 
     renderer = SDL_CreateRenderer(window, -1, 0);
-    //SDL_CreateWindowAndRenderer(0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP, &window, &renderer);
-
-    //SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");  // make the scaled rendering look smoother.
-    //SDL_RenderSetLogicalSize(renderer, TileSize*FieldSize, TileSize*FieldSize);
-
     SDL_Surface * GameOverScreen = IMG_Load("atari-abstract-clouds.jpg");//SDL_LoadBMP("Acorns.bmp");
     //SDL_Texture * GameOverTexture = SDL_CreateTextureFromSurface(renderer, GameOverScreen);
     SDL_FreeSurface(GameOverScreen);
@@ -181,11 +166,9 @@ return -1;
     SDL_Texture * BadgerTwoTexture = SDL_CreateTextureFromSurface(renderer, BadgerTwoBMP);
     SDL_FreeSurface(BadgerTwoBMP);
 
-
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
     // handle events
-
     std::string f_str;
     while (!quit)
     {
@@ -223,9 +206,6 @@ return -1;
         CheckBadgerPosition();
         // Set render color to red ( background will be rendered in this color )
         SDL_SetRenderDrawColor( renderer, 255, 255, 255, 255 );
-
-        //SDL_Rect dstrect = { x, y, TileSize, TileSize };
-
         SDL_RenderClear(renderer);
 
         SDL_Rect BackgroundRectangle = {0,0,TileSize*FieldSize,TileSize*FieldSize};
@@ -238,12 +218,10 @@ return -1;
 
         std::cout << "Badger Position: " << BadgerPosition.x << "," << BadgerPosition.y << std::endl;
 
-
         for(int Col = 0; Col < FieldSize; Col++)
         {
             for(int Row = 0; Row < FieldSize; Row++)
             {
-
                 // Set render color to blue ( rect will be rendered in this color )
                 SDL_SetRenderDrawColor( renderer, 0, 0, 255, 128 );
                 // Creat a rect at pos ( 50, 50 ) that's 50 pixels wide and 50 pixels high.
@@ -254,7 +232,6 @@ return -1;
                 r.h = TileSize;
                 // Render rect
                 //SDL_RenderFillRect( renderer, &r );
-
 
                 if( AcornField[Col][Row] == 0)
                 {
