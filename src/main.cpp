@@ -204,15 +204,15 @@ int main(int argc, char ** argv)
             switch (event.key.keysym.sym)
             {
                 case SDLK_ESCAPE: quit = true; break;
-                case SDLK_LEFT:  BadgerPosition.x -= TileSize; std::cout << "LEFT" << std::endl; break;
-                case SDLK_RIGHT: BadgerPosition.x += TileSize; std::cout << "RIGHT" << std::endl; break;
-                case SDLK_UP:    BadgerPosition.y -= TileSize; std::cout << "UP" << std::endl; break;
-                case SDLK_DOWN:  BadgerPosition.y += TileSize; std::cout << "DOWN" << std::endl; break;
+                case SDLK_LEFT:  BadgerPosition.x -= TileSize; break;
+                case SDLK_RIGHT: BadgerPosition.x += TileSize; break;
+                case SDLK_UP:    BadgerPosition.y -= TileSize; break;
+                case SDLK_DOWN:  BadgerPosition.y += TileSize; break;
 
-                case SDLK_a: BadgerTwoPosition.x -= TileSize; std::cout << "LEFT" << std::endl; break;
-                case SDLK_d: BadgerTwoPosition.x += TileSize; std::cout << "RIGHT" << std::endl; break;
-                case SDLK_w: BadgerTwoPosition.y -= TileSize; std::cout << "UP" << std::endl; break;
-                case SDLK_s: BadgerTwoPosition.y += TileSize; std::cout << "DOWN" << std::endl; break;
+                case SDLK_a: BadgerTwoPosition.x -= TileSize; break;
+                case SDLK_d: BadgerTwoPosition.x += TileSize; break;
+                case SDLK_w: BadgerTwoPosition.y -= TileSize; break;
+                case SDLK_s: BadgerTwoPosition.y += TileSize; break;
             } break;
         }
 
