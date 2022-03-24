@@ -8,13 +8,12 @@
 
 SDL_Point BadgerPosition;
 SDL_Point BadgerTwoPosition;
-int TileSize = 50;
+int TileSize = 100;
 int FieldSize = 10;
 SDL_Surface * GameOverScreen;
 SDL_Texture * GameOverTexture;
 SDL_Texture * BackgroundTexture;
 
-#define WAV_PATH "./data/Morph.wav"
 #define POSITIVE_OGG_PATH "./data/positive.ogg"
 #define NEGATIVE_OGG_PATH "./data/negative.ogg"
 #define MUS_PATH "./data/race-duel-short.wav"
@@ -25,6 +24,11 @@ Mix_Chunk *negative = NULL;
 Mix_Chunk *positive = NULL;
 // Our music file
 Mix_Music *music = NULL;
+
+int AcornField[10][10];
+SDL_Texture* testTexture;
+SDL_Texture* LoadTexture( const std::string &str );
+SDL_Renderer * renderer;
 
 void CheckBadgerPosition()
 {
@@ -47,8 +51,6 @@ void CheckBadgerPosition()
         BadgerTwoPosition.y = TileSize*FieldSize-TileSize;
 }
 
-int AcornField[10][10];
-
 bool GameOver()
 {
     int GoodAcorns = 0;
@@ -59,9 +61,6 @@ bool GameOver()
             if(AcornField[Row][Col] == 0)
             {
                 GoodAcorns++;
-            }
-            else
-            {
             }
         }
     }
@@ -75,10 +74,6 @@ bool GameOver()
         return false;
     }
 };
-
-SDL_Texture* testTexture;
-SDL_Texture* LoadTexture( const std::string &str );
-SDL_Renderer * renderer;
 
 int main(int argc, char ** argv)
 {
@@ -95,7 +90,7 @@ int main(int argc, char ** argv)
 	{
 	    for(int Row = 0; Row < FieldSize; Row++)
 	    {
-                 AcornField[Row][Col] = rand() % 4;
+            AcornField[Row][Col] = rand() % 4;
 	    }
 	}
 
@@ -115,16 +110,8 @@ int main(int argc, char ** argv)
     }
 
     // Load our sound effect
-    wave = Mix_LoadWAV(WAV_PATH);
-    if (wave == NULL)
-    {
-        std::cout << "Failed loading wave" << std::endl;
-        return -1;
-    }
-
-    // Load our sound effect
     positive = Mix_LoadWAV(POSITIVE_OGG_PATH);
-    if (positive == NULL)
+    if(positive == NULL)
     {
         std::cout << "Failed loading positive wave" << std::endl;
         return -1;
@@ -132,7 +119,7 @@ int main(int argc, char ** argv)
 
     // Load our sound effect
     negative = Mix_LoadWAV(NEGATIVE_OGG_PATH);
-    if (negative == NULL)
+    if(negative == NULL)
     {
         std::cout << "loading negative failed" << std::endl;
         return -1;
@@ -146,6 +133,10 @@ int main(int argc, char ** argv)
         return -1;
     }
 
+    //Set sound volumes
+    Mix_VolumeMusic(1);
+    Mix_Volume(-1, MIX_MAX_VOLUME / 10);
+
     if ( Mix_PlayMusic( music, -1) == -1 )
     {
         std::cout << "Failed playing music" << std::endl;
@@ -155,7 +146,7 @@ int main(int argc, char ** argv)
     SDL_Window * window = SDL_CreateWindow("GoNuts",
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, TileSize*FieldSize, TileSize*FieldSize, 0);
 
-    SDL_Surface* surface = IMG_Load( "./data/atari.png" );
+    SDL_Surface* surface = IMG_Load( "./data/logo.png" );
 
     // The icon is attached to the window pointer
     SDL_SetWindowIcon(window, surface);
@@ -183,6 +174,7 @@ int main(int argc, char ** argv)
 
     // handle events
     std::string f_str;
+
     while (!quit)
     {
         quit = GameOver();
@@ -222,22 +214,20 @@ int main(int argc, char ** argv)
         SDL_RenderClear(renderer);
 
         SDL_Rect BackgroundRectangle = {0,0,TileSize*FieldSize,TileSize*FieldSize};
-        BackgroundTexture = LoadTexture("./data/atari-abstract-clouds.jpg");
+        BackgroundTexture = LoadTexture("./data/background.jpg");
         SDL_SetTextureBlendMode( BackgroundTexture, SDL_BLENDMODE_BLEND );
         SDL_RenderCopy( renderer, BackgroundTexture, NULL, &BackgroundRectangle );
 
         // Set render color to blue ( rect will be rendered in this color )
         SDL_SetRenderDrawColor( renderer, 0, 0, 255, 255 );
 
-        //std::cout << "Badger Position: " << BadgerPosition.x << "," << BadgerPosition.y << std::endl;
-
         for(int Col = 0; Col < FieldSize; Col++)
         {
             for(int Row = 0; Row < FieldSize; Row++)
             {
-                // Set render color to blue ( rect will be rendered in this color )
+                // Set render color to blue
                 SDL_SetRenderDrawColor( renderer, 0, 0, 255, 128 );
-                // Creat a rect at pos ( 50, 50 ) that's 50 pixels wide and 50 pixels high.
+
                 SDL_Rect r;
                 r.x = TileSize*Row;
                 r.y = TileSize*Col;
@@ -284,7 +274,6 @@ int main(int argc, char ** argv)
                             return -1;
                     }
                 }
-                else{}
             }
         }
 
@@ -341,5 +330,3 @@ SDL_Texture* LoadTexture( const std::string &str )
     SDL_FreeSurface( surface );
     return texture;
 };
-
-
