@@ -37,25 +37,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="Acorns.bmp" />
-		<Unit filename="BadAcorns.bmp" />
-		<Unit filename="Badger.bmp" />
-		<Unit filename="Graphics.cpp" />
-		<Unit filename="LICENSE" />
-		<Unit filename="README.md" />
-		<Unit filename="bitmap.cpp" />
-		<Unit filename="bitmap.h" />
-		<Unit filename="buttons.cpp" />
-		<Unit filename="buttons.h" />
-		<Unit filename="defines.h" />
-		<Unit filename="graphics.h" />
-		<Unit filename="input.cpp" />
-		<Unit filename="input.h" />
-		<Unit filename="main.cpp" />
-		<Unit filename="update-github.sh" />
-		<Extensions>
-			<code_completion />
-			<debugger />
-		</Extensions>
+		<Unit filename="src/main.cpp" />
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
